@@ -64,7 +64,7 @@ class ContactINFO
     end
   end
 
-  def read_JSON(filename)
+  def read_JSON_file(filename)
     file = File.read "./#{filename}.json"
     data = JSON.parse(file)
     #puts data
@@ -178,7 +178,7 @@ class ContactINFO
 
   def run(filename, data)
     #label = self.init_lize(filename)
-    #data = self.read_JSON(filename)
+    #data = self.read_JSON_file(filename)
     self.reset_variables(filename)
     puts "FILE: #{filename}"
     webInfo = self.get_webInfo(data)
@@ -204,7 +204,7 @@ class ContactINFO
     listings = @listings
     listings.each_with_index do |company, index|
       puts "#{index} : #{company}"
-      data = self.read_JSON(company)
+      data = self.read_JSON_file(company)
       self.run(filename, data)
     end
 

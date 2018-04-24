@@ -1,2 +1,4 @@
 .api_key_test
 .api_key*
+*.json
+*.csv
