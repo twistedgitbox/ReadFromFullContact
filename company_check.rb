@@ -5,6 +5,7 @@ Bundler.require(:default)
 
 require_relative 'lib/api_check'
 require_relative 'lib/label_reader'
+require_relative 'lib/json_reader'
 
 files = File.join(File.dirname(__FILE__),'..','lib','**','*.rb')
 Dir.glob(files).each do |file|
