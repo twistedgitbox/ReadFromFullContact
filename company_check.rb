@@ -4,6 +4,7 @@ require 'bundler/setup'
 Bundler.require(:default)
 
 require_relative 'lib/api_check'
+require_relative 'lib/label_reader'
 
 files = File.join(File.dirname(__FILE__),'..','lib','**','*.rb')
 Dir.glob(files).each do |file|
@@ -17,22 +18,54 @@ class CompanyData
     key_made = "NONE"
     @key_made = self.get_API_key
     puts "KEYME #{@key_made}"
+    @arraylist = Make_List.new
+    @runlist = ""
   end
 
-  def write_FCtest_toJSON(filename, key_made)
-    filepath = "./#{filename}"
-    company_collect = "fullcontact.com"
-    url = "https://api.fullcontact.com/v2/company/lookup.json?domain=#{company_collect}&apiKey=#{key_made}"
+  def get_company_info(filename, key_made)
+    companylist_path = "./companylist_#{filename}"
+    list = @arraylist.get_companies_from_file(companylist_path)
+    @runlist = list
+    puts @runlist
+    @runlist.each_with_index do |company, index|
+      filepath = "./export/FC/json/#{company}_FC.json"
+      puts "FILE LOCATION #{filepath}"
+      if File.exist?(filepath) then
+        puts "FILE EXISTS IN DIRECTORY"
+      elsif
+        json_info = self.get_FCcompanyinfo_from_domain(filename, key_made, company)
+        puts
+        puts
+        puts json_info
+      end
+
+      puts "DONE #{company} for #{index}"
+    end
+    puts "COMPLETE"
+  end
+
+  def get_FCcompanyinfo_from_domain(filename, key_made, company)
+    url = "https://api.fullcontact.com/v2/company/lookup.json?domain=#{company}&apiKey=#{key_made}"
     response = RestClient.get(url)
     obj = JSON.parse(response.body)
     puts obj
-    json_screen = obj.to_json
-    File.open("#{filepath}.json","w") do |f|
-      f.write(obj.to_json)
-    end
-    puts json_screen.class
-    puts json_screen
+    json_info = obj.to_json
+    puts json_info.class
+    puts json_info
+    self.write_FCtest_toJSON(company, obj)
+    return json_info
+  end
 
+  def write_FCtest_toJSON(company, obj)
+    filepath = "./export/FC/json/#{company}_FC"
+    puts "FILE LOCATION #{filepath}"
+    if File.exist?(filepath) then
+      puts "FILE EXISTS IN DIRECTORY"
+    elsif
+      File.open("#{filepath}.json","w") do |f|
+        f.write(obj.to_json)
+      end
+    end
   end
 
   def key_set
@@ -51,11 +84,12 @@ class CompanyData
     puts "DOGFOOD"
     puts @key_made
     key_made = @key_made
-    self.write_FCtest_toJSON(filename, key_made)
+    self.get_company_info(filename, key_made)
+    #self.write_FCtest_toJSON(filename, key_made)
   end
 
 end
 
 companycheck = CompanyData.new
 
-companycheck.run("FullMe")
+companycheck.run("Full2")
