@@ -370,6 +370,42 @@ class FC_ContactINFO
     puts "*****"
     puts "SOCIAL #{socialInfo}"
     puts "*****"
+    if data.has_key? "socialProfiles" then
+      fullsocialInfo = data.fetch("socialProfiles") if data.has_key? "socialProfiles"
+      puts "****"
+      puts "SOCIAL #{fullsocialInfo}"
+      puts "****"
+      if fullsocialInfo.is_a?(Array) then
+        fullsocialInfo.uniq!
+
+        fullsocialInfo.each_with_index do |social, index|
+          puts "SOCIAL_link#{index}: #{social}"
+          bio = social.fetch("bio") if social.has_key? "bio"
+          typename = social.fetch("typeName") if social.has_key? "typeName"
+          sociallink = social.fetch("url") if social.has_key? "url"
+          puts social.class
+          puts typename
+          puts sociallink
+
+          if social.has_key? "bio" then
+            bio_name = "bio_#{typename}" if social.has_key? "typeName"
+            puts "#{bio_name}  :  #{bio}" if social.has_key? "bio"
+            @org_info[bio_name] = bio
+          end
+
+          if social.has_key? "url" || "sociallink" then
+            puts "SET SOCIAL URLS #{typename} & #{sociallink}"
+            @org_info[typename] = sociallink
+          end
+        end
+
+        puts "All social links listed"
+      end
+
+      puts fullsocialInfo.keys if fullsocialInfo.is_a?(Hash)
+    end
+
+    return socialInfo
   end
 
   def get_orgInfo(data)
@@ -381,21 +417,6 @@ class FC_ContactINFO
 
     puts data.keys
     puts data.keys[7]
-    if data.has_key? "socialProfiles" then
-      fullsocialInfo = data.fetch("socialProfiles") if data.has_key? "socialProfiles"
-      puts "****"
-      puts "SOCIAL #{fullsocialInfo}"
-      puts "****"
-      if fullsocialInfo.is_a?(Array) then
-        fullsocialInfo.each_with_index do |social, index|
-          puts "SOCIAL_link#{index}: #{social}"
-          puts social.class
-          puts
-        end
-        puts "All social links listed"
-      end
-    puts fullsocialInfo.keys if fullsocialInfo.is_a?(Hash)
-    end
     fullorgInfo = data.fetch("organization")
     puts "ORG INFO"
     puts fullorgInfo.keys
@@ -457,6 +478,7 @@ class FC_ContactINFO
     puts
     orgInfo = self.get_orgInfo(data)
     puts @org_info
+    socialInfo = self.get_socialInfo(data)
     self.convert_DATA_to_CSV(@org_info)
     self.write_csv(@org_info)
     my_hash = @org_info.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
