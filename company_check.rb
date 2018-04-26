@@ -6,6 +6,7 @@ Bundler.require(:default)
 require_relative 'lib/api_check'
 require_relative 'lib/label_reader'
 require_relative 'lib/FC_json_reader'
+require_relative 'lib/CB_json_reader'
 
 files = File.join(File.dirname(__FILE__),'..','lib','**','*.rb')
 Dir.glob(files).each do |file|
@@ -103,7 +104,7 @@ class CompanyData
   end
 
   def FC_run(filename)
-    puts "DOGFOOD #{filename}"
+    puts "File Being Run: => #{filename}"
     puts @key_made
     key_made = @key_made
     self.get_company_info(filename, key_made)

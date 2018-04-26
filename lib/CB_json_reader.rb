@@ -2,7 +2,7 @@
 require 'json'
 require 'csv'
 
-class FC_ContactINFO
+class CB_ContactINFO
 
   def initialize
     puts "INIT JSON CHECK"
