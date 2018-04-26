@@ -20,11 +20,13 @@ class CompanyData
     @key_made = self.get_API_key
     puts "KEYME #{@key_made}"
     @arraylist = Make_List.new
-    @runlist = ""
+    @runlist = []
+    @jsonarr = []
+    @jsonreader = ContactINFO.new
   end
 
   def get_company_info(filename, key_made)
-    companylist_path = "./companylist_#{filename}"
+    companylist_path = "./read/companylist_#{filename}"
     list = @arraylist.get_companies_from_file(companylist_path)
     @runlist = list
     puts @runlist
@@ -33,16 +35,35 @@ class CompanyData
       puts "FILE LOCATION #{filepath}"
       if File.exist?(filepath) then
         puts "FILE EXISTS IN DIRECTORY"
+        obj = @jsonreader.read_JSON_file(company, filepath)
       elsif
-        json_info = self.get_FCcompanyinfo_from_domain(filename, key_made, company)
+        obj = self.get_FCcompanyinfo_from_domain(filename, key_made, company)
         puts
         puts
-        puts json_info
       end
-
+      json_info = obj.to_json
+      puts json_info
+      puts "HERE IS THE JSON INFO"
+      @jsonarr << json_info
+      puts @jsonarr
+      puts "MATH"
+      #testone = @jsonreader.cycle_through(bear)
+      puts "TEST 2:#{@jsonarr}"
       puts "DONE #{company} for #{index}"
     end
-    puts "COMPLETE"
+    puts "ALL ABOARD"
+    puts @jsonarr
+    @jsonarr.each_with_index do |company, index|
+      puts
+      puts "DATA : #{company} & #{index}"
+      puts
+    end
+    listings = @jsonarr
+    testone = @jsonreader.cycle_through(listings, filename)
+    puts testone
+    puts
+    puts
+    puts "COMPLETE saved in #{filename}"
   end
 
   def get_FCcompanyinfo_from_domain(filename, key_made, company)
@@ -82,7 +103,7 @@ class CompanyData
   end
 
   def run(filename)
-    puts "DOGFOOD"
+    puts "DOGFOOD #{filename}"
     puts @key_made
     key_made = @key_made
     self.get_company_info(filename, key_made)
@@ -93,4 +114,5 @@ end
 
 companycheck = CompanyData.new
 
-companycheck.run("Full2")
+#companycheck.run("FC_#{Date.today.to_s}")
+companycheck.run("FC")

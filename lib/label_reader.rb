@@ -11,6 +11,7 @@ class Make_List
   end
 
   def list_from_file(filename)
+    puts "LOCATION #{filename}"
     list = File.readlines(filename)
     return list
   end
@@ -87,6 +88,8 @@ class Make_List
 
   def save_created_list(checkarrx, filename)
     fixedfile = filename.sub(/^.\//,'')
+    fixedfile = fixedfile.sub(/^read\//, "")
+    puts "FIX #{fixedfile}"
     newfile = "./export/#{fixedfile}.new"
     puts newfile
     File.open(newfile, "w+") do |f|
