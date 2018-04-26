@@ -5,7 +5,7 @@ Bundler.require(:default)
 
 require_relative 'lib/api_check'
 require_relative 'lib/label_reader'
-require_relative 'lib/json_reader'
+require_relative 'lib/FC_json_reader'
 
 files = File.join(File.dirname(__FILE__),'..','lib','**','*.rb')
 Dir.glob(files).each do |file|
@@ -22,7 +22,7 @@ class CompanyData
     @arraylist = Make_List.new
     @runlist = []
     @jsonarr = []
-    @jsonreader = ContactINFO.new
+    @jsonreader = FC_ContactINFO.new
   end
 
   def get_company_info(filename, key_made)
@@ -102,7 +102,7 @@ class CompanyData
     return key_made
   end
 
-  def run(filename)
+  def FC_run(filename)
     puts "DOGFOOD #{filename}"
     puts @key_made
     key_made = @key_made
@@ -115,4 +115,4 @@ end
 companycheck = CompanyData.new
 
 #companycheck.run("FC_#{Date.today.to_s}")
-companycheck.run("FC")
+companycheck.FC_run("FC")
