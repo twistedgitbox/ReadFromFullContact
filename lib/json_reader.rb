@@ -26,6 +26,10 @@ class ContactINFO
     puts "CALLING METHOD: #{caller[0] =~ /`([^']*)'/ and $1}"
     puts "CURRENT METHOD: #{__method__.to_s}"
     ## PUT IN CODE TO TRACK METHOD CALLS
+    puts; puts; puts
+    filename.sub!(/^.\/read\//,'')
+    filename = "./export/CSV/#{filename}"
+    puts "#### TRUNCATE FILES #{filename}"
     if File.exist?("./#{filename}_.csv") then
       File.truncate("./#{filename}_.csv", 0)
     end
@@ -84,7 +88,7 @@ class ContactINFO
     ## PUT IN CODE TO TRACK METHOD CALLS
 
     datafile = @datafile
-    datafile.sub!(/^.\/read/,'')
+    datafile.sub!(/^.\/read\//,'')
     datafile = "./export/CSV/#{@datafile}.csv"
 
     puts "FILE LOCATION: #{datafile}"
@@ -105,7 +109,10 @@ class ContactINFO
     ## PUT IN CODE TO TRACK METHOD CALLS
 
     datafile = @datafile
-    datafile.sub!(/^.\/read/,'')
+    puts "##########"
+    puts "INFO #{info_hash}"
+    puts "##########"
+    datafile.sub!(/^.\/read\//,'')
     datafile = "./export/CSV/#{@datafile}_.csv"
 
     puts
@@ -218,7 +225,7 @@ class ContactINFO
     if data.has_key? "name" then
       nameInfo = data.fetch("name")
     else
-      nameInfo == "NONE"
+      nameInfo = "NONE"
     end
 
     puts "NAME: #{nameInfo}"
@@ -236,12 +243,13 @@ class ContactINFO
     if data.has_key? "overview" then
       descInfo = data.fetch("overview")
     else
-      descInfo == "NONE"
+      descInfo = "NONE"
     end
 
     descInfo = data.fetch("overview")
     puts "DESC: #{descInfo}"
     @org_info['desc'] = descInfo
+    return descInfo
   end
 
   def get_phoneInfo(data)
@@ -266,13 +274,17 @@ class ContactINFO
     else
       phone = "NONE"
     end
-    puts phone1
+    puts "PHONESET: #{phone1}"
 
-    if !phoneInfo.is_a?(String)
-      phone = phone1.fetch("number")
+
+    if phone1.is_a?(Hash) then
+      phone = phone1.fetch("number") if  phone1.has_key? "number"
+      phone = phone1.fetch("Number") if phone1.has_key? "Number"
     end
-    puts phone
+
+    puts "PHONE #{phone}"
     @org_info['hq_phone'] = phone
+    return phone
   end
 
   def get_addressInfo(data)
@@ -287,6 +299,7 @@ class ContactINFO
       addressInfo == "NONE"
     end
 
+    puts "addressInfo : #{addressInfo}"
     if addressInfo.is_a?(Hash)
       puts "HASH"
       address1 = addressInfo
@@ -297,61 +310,39 @@ class ContactINFO
       address1 = "NONE"
     end
 
-    puts address1
-    if address1.has_key? "addressLine1" then
-      line1 = address1.fetch("addressLine1")
+    puts "ADDRESS SET: #{address1}"
+    if address1.is_a?(Hash) then
+      line1 = address1.fetch("addressLine1") if address1.has_key? "addressLine1"
+      city = address1.fetch("locality") if address1.has_key? "locality"
+      zip = address1.fetch("postalCode") if address1.has_key? "postalCode"
+      stateInfo = address1.fetch("region") if address1.has_key? "region"
+      countryInfo = address1.fetch("country") if address1.has_key? "country"
+      stateInfo = address1.fetch("state") if address1.key?("state")
+      if stateInfo.kind_of?(Hash) then
+        state = stateInfo.fetch("code") if stateInfo.has_key? "code"
+        puts "StateInfo #{stateInfo}"
+      else
+        state = stateInfo
+      end
+
+      if countryInfo.kind_of?(Hash) then
+        country = countryInfo.fetch("name") if countryInfo.has_key? "name"
+      else
+        country = countryInfo
+      end
     else
       line1 = "NONE LISTED"
-    end
-
-    if address1.has_key? "locality" then
-      city = address1.fetch("locality")
-    else
       city = "NONE LISTED"
-    end
-
-    if address1.has_key? "postalCode" then
-      zip = address1.fetch("postalCode")
-    else
       zip = "NONE"
+      state = "NONE"
+      country = "NONE"
     end
 
-    if address1.has_key? "region" then
-    stateInfo = address1.fetch("region")
-    else
-      stateInfo = "NONE"
-    end
-
-    if address1.has_key? "country" then
-      countryInfo = address1.fetch("country")
-    else
-      countryInfo = "NONE"
-    end
-
-    if address1.key?("state") then
-      stateInfo = address1.fetch("state")
-    else
-      stateInfo = "NONE"
-    end
-
-    puts stateInfo.class
-
-    if stateInfo.kind_of?(Array) && stateInfo.key("name") then
-      state = stateInfo.fetch("name")
-    else
-      state = stateInfo
-    end
-
-    if countryInfo.kind_of?(Array) && countryInfo.key("name") then
-      country = countryInfo.fetch("name")
-    else
-      country = countryInfo
-    end
-
-    puts line1
-    puts city
-    puts zip
-    puts state
+    puts "Line1: #{line1}"
+    puts "City: #{city}"
+    puts "Zip: #{zip}"
+    puts "State: #{state}"
+    puts "Country: #{country}"
     @org_info['address1'] = line1
     @org_info['city'] = city
     @org_info['state'] = state
@@ -394,7 +385,20 @@ class ContactINFO
     descInfo = self.get_descInfo(fullorgInfo)
     keyInfo = self.get_keywords(fullorgInfo)
     puts "NAME: #{nameInfo}"
-    orgInfo = fullorgInfo.fetch("contactInfo")
+    puts fullorgInfo.keys
+    puts "there is a key for Contact" if fullorgInfo.has_key? "contactInfo"
+    if fullorgInfo.has_key? "contactInfo" then
+      orgInfo = fullorgInfo.fetch("contactInfo")
+      contactInfo = orgInfo
+      puts "A: #{fullorgInfo}"
+      puts "#"
+      puts " ORG: #{orgInfo}"
+      puts contactInfo.class
+    else
+      contactInfo = "NONE"
+      orgInfo = {}
+    end
+
     puts orgInfo.class
     puts
     puts orgInfo.keys
@@ -403,9 +407,14 @@ class ContactINFO
       puts
       puts
     end
+    puts "CONTACT HERE: #{contactInfo}"
+    puts orgInfo
+    #if contactInfo = "NONE" then
+    #  puts "NO CONTACT INFO"
+    #else
     phoneInfo = self.get_phoneInfo(orgInfo)
     addressInfo = self.get_addressInfo(orgInfo)
-
+    #end
     return orgInfo
   end
 

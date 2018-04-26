@@ -54,9 +54,9 @@ class CompanyData
     puts "ALL ABOARD"
     puts @jsonarr
     @jsonarr.each_with_index do |company, index|
-      puts
+      puts "***"
       puts "DATA : #{company} & #{index}"
-      puts
+      puts "***"
     end
     listings = @jsonarr
     testone = @jsonreader.cycle_through(listings, filename)
@@ -75,7 +75,7 @@ class CompanyData
     puts json_info.class
     puts json_info
     self.write_FCtest_toJSON(company, obj)
-    return json_info
+    return obj
   end
 
   def write_FCtest_toJSON(company, obj)
