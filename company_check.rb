@@ -20,9 +20,11 @@ class CompanyData
     @key_made = self.get_API_key
     puts "KEYME #{@key_made}"
     @arraylist = Make_List.new
+    @CB_arraylist =
     @runlist = []
     @jsonarr = []
     @jsonreader = FC_ContactINFO.new
+    @CB_jsonreader = CB_ContactINFO.new
   end
 
   def get_company_FCinfo(filename, key_made)
@@ -77,7 +79,7 @@ class CompanyData
       puts "FILE LOCATION #{filepath}"
       if File.exist?(filepath) then
         puts "FILE EXISTS IN DIRECTORY"
-        obj = @jsonreader.read_JSON_file(company, filepath)
+        obj = @CB_jsonreader.read_JSON_file(company, filepath)
       elsif
         obj = self.get_CBcompanyinfo_from_domain(filename, key_made, company)
         puts
@@ -101,7 +103,7 @@ class CompanyData
       puts "***"
     end
     listings = @jsonarr
-    testone = @jsonreader.cycle_through(listings, filename)
+    testone = @CB_jsonreader.cycle_through(listings, filename)
     puts testone
     puts
     puts

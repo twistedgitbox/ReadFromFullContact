@@ -203,8 +203,9 @@ class CB_ContactINFO
     puts "CURRENT METHOD: #{__method__.to_s}"
     ## PUT IN CODE TO TRACK METHOD CALLS
 
-    if data.has_key? "website" then
-      webInfo = data.fetch("website")
+    if data.has_key? "domain" then
+      webInfo = data.fetch("domain")
+      webInfo = "https://www.#{webInfo}"
     else
       webInfo == "NONE"
     end
@@ -213,6 +214,26 @@ class CB_ContactINFO
     puts webInfo.class
     @org_info['url'] = webInfo
     return webInfo
+  end
+
+  def get_siteInfo(data)
+    ## TRACK METHODS ##
+    puts "CALLING METHOD: #{caller[0] =~ /`([^']*)'/ and $1}"
+    puts "CURRENT METHOD: #{__method__.to_s}"
+    ## PUT IN CODE TO TRACK METHOD CALLS
+
+    if data.has_key? "site" then
+      siteInfo = data.fetch("site")
+      self.get_phoneInfo(siteInfo) if siteInfo.is_a?(Hash)
+    else
+      siteInfo = "NONE"
+    end
+
+    mainphoneInfo = self.get_mainphone_info(data)
+
+    puts "site: #{siteInfo}"
+    return siteInfo
+
   end
 
   def get_nameInfo(data)
@@ -240,13 +261,13 @@ class CB_ContactINFO
     puts "CURRENT METHOD: #{__method__.to_s}"
     ## PUT IN CODE TO TRACK METHOD CALLS
 
-    if data.has_key? "overview" then
-      descInfo = data.fetch("overview")
+    if data.has_key? "description" then
+      descInfo = data.fetch("description")
     else
       descInfo = "NONE"
     end
 
-    descInfo = data.fetch("overview")
+    #descInfo = data.fetch("overview")
     puts "DESC: #{descInfo}"
     @org_info['desc'] = descInfo
     return descInfo
@@ -275,12 +296,19 @@ class CB_ContactINFO
       phone = "NONE"
     end
     puts "PHONESET: #{phone1}"
+    puts phone1.class
 
 
     if phone1.is_a?(Hash) then
       phone = phone1.fetch("number") if  phone1.has_key? "number"
       phone = phone1.fetch("Number") if phone1.has_key? "Number"
+    elsif phone1.is_a?(Array) then
+      phone = phone1[0]
+    else
+      phone = phone1
     end
+
+    phone = phone.to_s
 
     puts "PHONE #{phone}"
     @org_info['hq_phone'] = phone
@@ -293,10 +321,17 @@ class CB_ContactINFO
     puts "CALLING METHOD: #{caller[0] =~ /`([^']*)'/ and $1}"
     puts "CURRENT METHOD: #{__method__.to_s}"
     ## PUT IN CODE TO TRACK METHOD CALLS
-    if data.has_key? "addresses" then
-      addressInfo = data.fetch("addresses")
+
+    if data.has_key? "location" then
+      addressInfo = data.fetch("location")
     else
-      addressInfo == "NONE"
+      line1 = "NONE"
+    end
+
+    if data.has_key? "geo" then
+      addressInfo = data.fetch("geo")
+    else
+      addressInfo = "NONE"
     end
 
     puts "addressInfo : #{addressInfo}"
@@ -312,21 +347,22 @@ class CB_ContactINFO
 
     puts "ADDRESS SET: #{address1}"
     if address1.is_a?(Hash) then
-      line1 = address1.fetch("addressLine1") if address1.has_key? "addressLine1"
-      city = address1.fetch("locality") if address1.has_key? "locality"
+      city = address1.fetch("city") if address1.has_key? "city"
       zip = address1.fetch("postalCode") if address1.has_key? "postalCode"
       stateInfo = address1.fetch("region") if address1.has_key? "region"
-      countryInfo = address1.fetch("country") if address1.has_key? "country"
-      stateInfo = address1.fetch("state") if address1.key?("state")
+      countryInfo = address1.fetch("countryCode") if address1.has_key? "countryCode"
+      stateInfo = address1.fetch("stateCode") if address1.key?("stateCode")
+      latInfo = address1.fetch("lat") if address1.has_key? "lat"
+      lngInfo = address1.fetch("lng") if address1.has_key? "lng"
       if stateInfo.kind_of?(Hash) then
-        state = stateInfo.fetch("code") if stateInfo.has_key? "code"
+        state = stateInfo.fetch("state") if stateInfo.has_key? "state"
         puts "StateInfo #{stateInfo}"
       else
         state = stateInfo
       end
 
       if countryInfo.kind_of?(Hash) then
-        country = countryInfo.fetch("name") if countryInfo.has_key? "name"
+        country = countryInfo.fetch("country") if countryInfo.has_key? "country"
       else
         country = countryInfo
       end
@@ -343,11 +379,16 @@ class CB_ContactINFO
     puts "Zip: #{zip}"
     puts "State: #{state}"
     puts "Country: #{country}"
+    puts "Latitude: #{latInfo}"
+    puts "Longitude: #{lngInfo}"
     @org_info['address1'] = line1
     @org_info['city'] = city
-    @org_info['state'] = state
+    @org_info['state'] = stateInfo
     @org_info['zipcode'] = zip
-    @org_info['country'] = country
+    @org_info['country'] = countryInfo
+    @org_info['lat'] = latInfo
+    @org_info['lng'] = lngInfo
+    return address1
   end
 
   def get_keywords(data)
@@ -356,20 +397,143 @@ class CB_ContactINFO
     puts "CALLING METHOD: #{caller[0] =~ /`([^']*)'/ and $1}"
     puts "CURRENT METHOD: #{__method__.to_s}"
     ## PUT IN CODE TO TRACK METHOD CALLS
-    if data.has_key? "keywords" then
-      keyInfo = data.fetch("keywords")
+    if data.has_key? "tags" then
+      keyInfo = data.fetch("tags")
     elsif
       keyInfo == "NONE"
     end
     puts "KEYWORDS: #{keyInfo}"
     @org_info['keywds'] = keyInfo
+    return keyInfo
+  end
+
+  def get_categoryInfo(data)
+    puts "CALLING METHOD: #{caller[0] =~ /`([^']*)'/ and $1}"
+    puts "CURRENT METHOD: #{__method__.to_s}"
+    ## PUT IN CODE TO TRACK METHOD CALLS
+    if data.has_key? "category" then
+      catInfo = data.fetch("category")
+    else
+      catInfo = "NONE"
+    end
+    puts "CATEGORY_INFO: #{catInfo}"
+    @org_info['category_info'] = catInfo
+    return catInfo
   end
 
   def get_socialInfo(data)
-    socialInfo = data.fetch("socialProfiles")
     puts "*****"
-    puts "SOCIAL #{socialInfo}"
+    puts "SOCIAL "
     puts "*****"
+    linkedInfo = self.get_linkedin_info(data)
+    facebookInfo = self.get_facebook_info(data)
+    twitterInfo = self.get_twitter_info(data)
+    crunchbaseInfo = self.get_crunchbase_info(data)
+    puts linkedInfo
+    puts facebookInfo
+    puts twitterInfo
+    puts crunchbaseInfo
+    socialInfo = [linkedInfo, facebookInfo, twitterInfo, crunchbaseInfo]
+    return socialInfo
+  end
+
+
+  def get_linkedin_info(data)
+    puts "CALLING METHOD: #{caller[0] =~ /`([^']*)'/ and $1}"
+    puts "CURRENT METHOD: #{__method__.to_s}"
+    ## PUT IN CODE TO TRACK METHOD CALLS
+    if data.has_key? "linkedin" then
+      linkedinInfo = data.fetch("linkedin")
+    else
+      linkedinInfo = "NONE"
+    end
+    puts "linkedin_INFO: #{linkedinInfo}"
+    @org_info['linkedin_info'] = linkedinInfo
+    return linkedinInfo
+  end
+
+  def get_facebook_info(data)
+    puts "CALLING METHOD: #{caller[0] =~ /`([^']*)'/ and $1}"
+    puts "CURRENT METHOD: #{__method__.to_s}"
+    ## PUT IN CODE TO TRACK METHOD CALLS
+    if data.has_key? "facebook" then
+      facebookInfo = data.fetch("facebook")
+    else
+      facebookInfo = "NONE"
+    end
+    puts "Facebook_INFO: #{facebookInfo}"
+    @org_info['facebook_info'] = facebookInfo
+    return facebookInfo
+  end
+
+  def get_twitter_info(data)
+    puts "CALLING METHOD: #{caller[0] =~ /`([^']*)'/ and $1}"
+    puts "CURRENT METHOD: #{__method__.to_s}"
+    ## PUT IN CODE TO TRACK METHOD CALLS
+    if data.has_key? "twitter" then
+      twitterInfo = data.fetch("twitter")
+    else
+      twitterInfo = "NONE"
+    end
+    puts "Twitter_INFO: #{twitterInfo}"
+    @org_info['twitterInfo'] = twitterInfo
+    return twitterInfo
+  end
+
+  def get_crunchbase_info(data)
+    puts "CALLING METHOD: #{caller[0] =~ /`([^']*)'/ and $1}"
+    puts "CURRENT METHOD: #{__method__.to_s}"
+    ## PUT IN CODE TO TRACK METHOD CALLS
+    if data.has_key? "crunchbase" then
+      crunchbaseInfo = data.fetch("crunchbase")
+    else
+      crunchbaseInfo = "NONE"
+    end
+    puts "crunchbase_INFO: #{crunchbaseInfo}"
+    @org_info['crunchbase_info'] = crunchbaseInfo
+    return crunchbaseInfo
+  end
+
+  def get_mainphone_info(data)
+    puts "CALLING METHOD: #{caller[0] =~ /`([^']*)'/ and $1}"
+    puts "CURRENT METHOD: #{__method__.to_s}"
+    ## PUT IN CODE TO TRACK METHOD CALLS
+    if data.has_key? "phone" then
+      phoneInfo = data.fetch("phone")
+      phoneInfo = data.fetch("phoneNumbers") if data.has_key? "phoneNumbers"
+      puts "mainphone_key #{phoneInfo}"
+
+      if phoneInfo.is_a?(Hash)
+        puts "HASH"
+        phone1 = phoneInfo
+      elsif phoneInfo.is_a?(Array)
+        puts "ARRAY"
+        phone1 = phoneInfo[0]
+      else
+        phone1 = phoneInfo
+      end
+
+      puts "MAINPHONESET: #{phone1}"
+      puts phone1.class
+
+      if phone1.is_a?(Hash) then
+        phone = phone1.fetch("number") if  phone1.has_key? "number"
+        phone = phone1.fetch("Number") if phone1.has_key? "Number"
+      elsif phone1.is_a?(Array) then
+        phone = phone1[0]
+      else
+        phone = phone1
+      end
+
+    else
+      phone = "NONE"
+    end
+
+    phone = phone.to_s
+
+    puts "Main Phone: #{phone}"
+    @org_info['main_phone'] = phone
+    return phone
   end
 
   def get_orgInfo(data)
@@ -381,64 +545,23 @@ class CB_ContactINFO
 
     puts data.keys
     puts data.keys[7]
-    if data.has_key? "socialProfiles" then
-      fullsocialInfo = data.fetch("socialProfiles") if data.has_key? "socialProfiles"
-      puts "****"
-      puts "SOCIAL #{fullsocialInfo}"
-      puts "****"
-      if fullsocialInfo.is_a?(Array) then
-        fullsocialInfo.each_with_index do |social, index|
-          puts "SOCIAL_link#{index}: #{social}"
-          puts social.class
-          puts
-        end
-        puts "All social links listed"
-      end
-    puts fullsocialInfo.keys if fullsocialInfo.is_a?(Hash)
-    end
-    fullorgInfo = data.fetch("organization")
-    puts "ORG INFO"
-    puts fullorgInfo.keys
-    fullorgInfo.each do |key, val|
-      puts "#{key} = #{val}"
-      puts
-    end
 
-    nameInfo = self.get_nameInfo(fullorgInfo)
-    descInfo = self.get_descInfo(fullorgInfo)
-    keyInfo = self.get_keywords(fullorgInfo)
-    puts "NAME: #{nameInfo}"
-    puts fullorgInfo.keys
-    puts "there is a key for Contact" if fullorgInfo.has_key? "contactInfo"
-    if fullorgInfo.has_key? "contactInfo" then
-      orgInfo = fullorgInfo.fetch("contactInfo")
-      contactInfo = orgInfo
-      puts "A: #{fullorgInfo}"
-      puts "#"
-      puts " ORG: #{orgInfo}"
-      puts contactInfo.class
-    else
-      contactInfo = "NONE"
-      orgInfo = {}
-    end
-
-    puts orgInfo.class
-    puts
-    puts orgInfo.keys
-    orgInfo.each do |key, val|
-      puts "#{key} => #{val}"
-      puts
-      puts
-    end
-    puts "CONTACT HERE: #{contactInfo}"
-    puts orgInfo
-    #if contactInfo = "NONE" then
-    #  puts "NO CONTACT INFO"
-    #else
-    phoneInfo = self.get_phoneInfo(orgInfo)
-    addressInfo = self.get_addressInfo(orgInfo)
-    #end
-    return orgInfo
+    nameInfo = self.get_nameInfo(data)
+    webInfo = self.get_webInfo(data)
+    siteInfo = self.get_siteInfo(data)
+    descInfo = self.get_descInfo(data)
+    addressInfo = self.get_addressInfo(data)
+    keyInfo = self.get_keywords(data)
+    catInfo = self.get_categoryInfo(data)
+    socialInfo = self.get_socialInfo(data)
+    puts "###OUTPUT####"
+    puts nameInfo
+    puts siteInfo
+    puts descInfo
+    puts addressInfo
+    puts keyInfo
+    puts catInfo
+    puts socialInfo
   end
 
   def run(filename, data)
@@ -452,7 +575,6 @@ class CB_ContactINFO
 
     self.reset_variables(filename)
     puts "FILE: #{filename}"
-    webInfo = self.get_webInfo(data)
     puts
     puts
     orgInfo = self.get_orgInfo(data)
@@ -462,6 +584,11 @@ class CB_ContactINFO
     my_hash = @org_info.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
     puts my_hash
     my_hash = @org_info
+
+    @org_info.each do |key, value|
+      puts  "#{key} #{value}"
+      puts
+    end
 
   end
 
