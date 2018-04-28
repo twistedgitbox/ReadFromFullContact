@@ -46,9 +46,13 @@ class Make_List
       company.sub!(/^https?\:\/\/(www.)?/,'')
       company.sub!(/^www./,'')
       company.chomp!("/")
+      #testarr.delete(company) if company[0,1] = "#"
       puts index, company
     end
-    return list
+    arr_list = testarr.drop(4)
+    puts arr_list
+    return arr_list
+    #return list
   end
 
   def read_labels(filename, label)

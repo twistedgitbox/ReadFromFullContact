@@ -128,11 +128,24 @@ class CompanyData
     puts "FILE LOCATION #{filepath}"
     if File.exist?(filepath) then
       puts "FILE EXISTS IN DIRECTORY"
-    elsif
+    else
       File.open("#{filepath}.json","w") do |f|
         f.write(obj.to_json)
       end
+    # AFTER SAVING FILE LOG RESULT
+      msg = "#{Date.today.to_s}_SAVED in #{filepath} for #{company} RESULT #{obj}"
+
+      msgtest = obj.to_json
+      if msgtest.is_a?(Hash) then
+        msg = "ERROR #{Date.today.to_s} in #{filepath} for #{company} RESULT: #{obj.to_json}" if msgtest.has_key? "error"
+      end
+      filepath = "./export/FC/FC_#{Date.today.to_s}"
+      File.open("#{filepath}.log","a") do |f|
+        puts msg
+        f.write(msg)
+      end
     end
+
   end
 
   def get_CBcompanyinfo_from_domain(filename, key_made, company)
@@ -166,10 +179,24 @@ class CompanyData
     puts "FILE LOCATION #{filepath}"
     if File.exist?(filepath) then
       puts "FILE EXISTS IN DIRECTORY"
-    elsif
+    else
       File.open("#{filepath}.json","w") do |f|
         puts "#{filepath}"
         f.write(obj.to_json)
+      end
+      #
+      # AFTER SAVING FILE LOG RESULT
+      #
+      msgtest = obj
+      msg = "#{Date.today.to_s}_SAVED in #{filepath} for #{company} RESULT: #{msgtest[0...20]}"
+      if msgtest.is_a?(Hash) then
+        msg = "ERROR #{Date.today.to_s} in #{filepath} for #{company} RESULT: #{obj.to_json}" if msgtest.has_key? "error"
+      end
+      filepath = "./export/CB/CB_#{Date.today.to_s}"
+      msg = "#{msg}\n"
+      File.open("#{filepath}.log","a") do |f|
+        puts msg
+        f.write(msg)
       end
     end
   end

@@ -236,7 +236,7 @@ class CB_ContactINFO
 
   end
 
-  def get_nameInfo(data)
+  def get_nameInfo(data, company)
 
     ## TRACK METHODS ##
     puts "CALLING METHOD: #{caller[0] =~ /`([^']*)'/ and $1}"
@@ -246,7 +246,7 @@ class CB_ContactINFO
     if data.has_key? "name" then
       nameInfo = data.fetch("name")
     else
-      nameInfo = "NONE"
+      nameInfo = "NONE FOUND FOR #{company}"
     end
 
     puts "NAME: #{nameInfo}"
@@ -536,7 +536,7 @@ class CB_ContactINFO
     return phone
   end
 
-  def get_orgInfo(data)
+  def get_orgInfo(data, company)
 
     ## TRACK METHODS ##
     puts "CALLING METHOD: #{caller[0] =~ /`([^']*)'/ and $1}"
@@ -546,7 +546,7 @@ class CB_ContactINFO
     puts data.keys
     puts data.keys[7]
 
-    nameInfo = self.get_nameInfo(data)
+    nameInfo = self.get_nameInfo(data, company)
     webInfo = self.get_webInfo(data)
     siteInfo = self.get_siteInfo(data)
     descInfo = self.get_descInfo(data)
@@ -564,7 +564,7 @@ class CB_ContactINFO
     puts socialInfo
   end
 
-  def run(filename, data)
+  def run(filename, data, company)
     #label = self.init_lize(filename)
     #data = self.read_JSON_file(filename)
 
@@ -577,7 +577,7 @@ class CB_ContactINFO
     puts "FILE: #{filename}"
     puts
     puts
-    orgInfo = self.get_orgInfo(data)
+    orgInfo = self.get_orgInfo(data, company)
     puts @org_info
     self.convert_DATA_to_CSV(@org_info)
     self.write_csv(@org_info)
@@ -612,7 +612,7 @@ class CB_ContactINFO
     listings.each_with_index do |company, index|
       puts "#{index} : #{company}"
       data = self.read_JSON_info(company)
-      self.run(filename, data)
+      self.run(filename, data, company)
     end
 
   end
