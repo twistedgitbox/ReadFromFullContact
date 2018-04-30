@@ -39,17 +39,35 @@ class Make_List
     return list
   end
 
+  def get_url_hostname(company)
+    url = "#{company}"
+    newcompany = URI.parse(url).host
+    newcompany.to_s
+    return newcompany
+  end
+
   def remove_url(list)
     puts "Another #{list}"
     testarr = list
+    fixedarr = []
     testarr.each_with_index do |company, index|
+      if company.start_with?("http", "www", "https") then
+        newcompany =self.get_url_hostname(company)
+        puts "NEWCOMPANY #{newcompany}"
+        company = newcompany
+      end
       company.sub!(/^https?\:\/\/(www.)?/,'')
+      company.sub!(/^http?\:\/\/(www.)?/,'')
+      company.sub!(/^https:\/\//,'')
+      company.sub!(/^http:\/\//,'')
       company.sub!(/^www./,'')
+      #company = company.split("/")[0]
       company.chomp!("/")
       #testarr.delete(company) if company[0,1] = "#"
-      puts index, company
+      puts "INDEX#{index} AND #{company}"
+      fixedarr << company
     end
-    arr_list = testarr.drop(4)
+    arr_list = fixedarr.drop(4)
     puts arr_list
     return arr_list
     #return list

@@ -1,0 +1,7 @@
+CSV.open("/tmp/file.csv", 'wb') do |csv|
+   csv << hash.keys
+   max_len = hash.values.map(&:length).max
+   (0...max_len).zip(*hash.values).each do |_, *row|
+    csv << row
+  end
+end
