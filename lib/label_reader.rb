@@ -52,7 +52,7 @@ class Make_List
     testarr = list
     fixedarr = []
     testarr.each_with_index do |company, index|
-      if company.start_with?("http", "www", "https") then
+      if company.start_with?("http", "https") then
         newcompany = self.get_url_hostname(company)
         puts "NEWCOMPANY #{newcompany}"
         company = newcompany
