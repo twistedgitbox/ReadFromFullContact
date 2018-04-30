@@ -41,8 +41,9 @@ class Make_List
 
   def get_url_hostname(company)
     url = "#{company}"
-    newcompany = URI.parse(url).host
-    newcompany.to_s
+    company_url = URI.parse(url).host
+    newcompany = company_url.to_s
+    puts "****#{newcompany}"
     return newcompany
   end
 
@@ -52,7 +53,7 @@ class Make_List
     fixedarr = []
     testarr.each_with_index do |company, index|
       if company.start_with?("http", "www", "https") then
-        newcompany =self.get_url_hostname(company)
+        newcompany = self.get_url_hostname(company)
         puts "NEWCOMPANY #{newcompany}"
         company = newcompany
       end
@@ -69,6 +70,7 @@ class Make_List
     end
     arr_list = fixedarr.drop(4)
     puts arr_list
+    #abort
     return arr_list
     #return list
   end
