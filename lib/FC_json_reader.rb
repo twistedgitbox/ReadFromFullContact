@@ -246,7 +246,7 @@ class FC_ContactINFO
       descInfo = "NONE"
     end
 
-    descInfo = data.fetch("overview")
+    descInfo = data.fetch("overview") if data.has_key? "overview"
     puts "DESC: #{descInfo}"
     @org_info['desc'] = descInfo
     return descInfo
@@ -366,7 +366,8 @@ class FC_ContactINFO
   end
 
   def get_socialInfo(data)
-    socialInfo = data.fetch("socialProfiles")
+    socialInfo = {}
+    socialInfo = data.fetch("socialProfiles") if data.has_key? "socialProfiles"
     puts "*****"
     puts "SOCIAL #{socialInfo}"
     puts "*****"
@@ -417,47 +418,57 @@ class FC_ContactINFO
 
     puts data.keys
     puts data.keys[7]
-    fullorgInfo = data.fetch("organization")
-    puts "ORG INFO"
-    puts fullorgInfo.keys
-    fullorgInfo.each do |key, val|
-      puts "#{key} = #{val}"
-      puts
-    end
+    if data.has_key? "organization" then
+      fullorgInfo = data.fetch("organization")
+      puts "ORG INFO"
+      puts fullorgInfo.keys
 
-    nameInfo = self.get_nameInfo(fullorgInfo)
-    descInfo = self.get_descInfo(fullorgInfo)
-    keyInfo = self.get_keywords(fullorgInfo)
-    puts "NAME: #{nameInfo}"
-    puts fullorgInfo.keys
-    puts "there is a key for Contact" if fullorgInfo.has_key? "contactInfo"
-    if fullorgInfo.has_key? "contactInfo" then
-      orgInfo = fullorgInfo.fetch("contactInfo")
-      contactInfo = orgInfo
-      puts "A: #{fullorgInfo}"
-      puts "#"
-      puts " ORG: #{orgInfo}"
-      puts contactInfo.class
+      fullorgInfo.each do |key, val|
+        puts "#{key} = #{val}"
+        puts
+      end
+
+      nameInfo = self.get_nameInfo(fullorgInfo)
+      descInfo = self.get_descInfo(fullorgInfo)
+      keyInfo = self.get_keywords(fullorgInfo)
+      puts "NAME: #{nameInfo}"
+      puts fullorgInfo.keys
+      puts "there is a key for Contact" if fullorgInfo.has_key? "contactInfo"
+
+      if fullorgInfo.has_key? "contactInfo" then
+        orgInfo = fullorgInfo.fetch("contactInfo")
+        contactInfo = orgInfo
+        puts "A: #{fullorgInfo}"
+        puts "#"
+        puts " ORG: #{orgInfo}"
+        puts contactInfo.class
+      else
+        contactInfo = "NONE"
+        orgInfo = {}
+      end
+
+      puts orgInfo.class
+      puts
+      puts orgInfo.keys
+
+      orgInfo.each do |key, val|
+        puts "#{key} => #{val}"
+        puts
+        puts
+      end
+
+      puts "CONTACT HERE: #{contactInfo}"
+      puts orgInfo
+      #if contactInfo = "NONE" then
+      #  puts "NO CONTACT INFO"
+      #else
+      phoneInfo = self.get_phoneInfo(orgInfo)
+      addressInfo = self.get_addressInfo(orgInfo)
     else
+      fullorginfo = {"contactInfo"=>"NONE"}
       contactInfo = "NONE"
       orgInfo = {}
     end
-
-    puts orgInfo.class
-    puts
-    puts orgInfo.keys
-    orgInfo.each do |key, val|
-      puts "#{key} => #{val}"
-      puts
-      puts
-    end
-    puts "CONTACT HERE: #{contactInfo}"
-    puts orgInfo
-    #if contactInfo = "NONE" then
-    #  puts "NO CONTACT INFO"
-    #else
-    phoneInfo = self.get_phoneInfo(orgInfo)
-    addressInfo = self.get_addressInfo(orgInfo)
     #end
     return orgInfo
   end

@@ -2,3 +2,5 @@
 .api_key*
 *.json
 *.csv
+
+ARCHIVE/*

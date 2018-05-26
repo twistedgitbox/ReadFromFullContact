@@ -25,6 +25,7 @@ class CompanyData
     @jsonarr = []
     @jsonreader = FC_ContactINFO.new
     @CB_jsonreader = CB_ContactINFO.new
+    @errorlist = []
   end
 
   def get_company_FCinfo(filename, key_made)
@@ -34,24 +35,29 @@ class CompanyData
     puts @runlist
     @runlist.each_with_index do |company, index|
       filepath = "./export/FC/json/#{company}_FC.json"
-      puts "FILE LOCATION #{filepath}"
-      if File.exist?(filepath) then
-        puts "FILE EXISTS IN DIRECTORY"
-        obj = @jsonreader.read_JSON_file(company, filepath)
-      elsif
-        obj = self.get_FCcompanyinfo_from_domain(filename, key_made, company)
-        puts
-        puts
+      puts "COMPANY TO GET #{company}"
+      if company.nil? || company == "" then
+        puts "COMPANY IS NADA"
+      else
+        puts "FILE LOCATION #{filepath}"
+        if File.exist?(filepath) then
+          puts "FILE EXISTS IN DIRECTORY"
+          obj = @jsonreader.read_JSON_file(company, filepath)
+        elsif
+          obj = self.get_FCcompanyinfo_from_domain(filename, key_made, company)
+          puts
+          puts
+        end
+        json_info = obj.to_json
+        puts json_info
+        puts "HERE IS THE JSON INFO"
+        @jsonarr << json_info
+        puts @jsonarr
+        puts "MATH"
+        #testone = @jsonreader.cycle_through(bear)
+        puts "TEST 2:#{@jsonarr}"
+        puts "DONE #{company} for #{index}"
       end
-      json_info = obj.to_json
-      puts json_info
-      puts "HERE IS THE JSON INFO"
-      @jsonarr << json_info
-      puts @jsonarr
-      puts "MATH"
-      #testone = @jsonreader.cycle_through(bear)
-      puts "TEST 2:#{@jsonarr}"
-      puts "DONE #{company} for #{index}"
     end
     puts "ALL ABOARD"
     puts @jsonarr
@@ -137,6 +143,12 @@ class CompanyData
       msg = "#{Date.today.to_s}_SAVED in #{filepath} for #{company} RESULT: #{msgtest[0...20]}"
       if msgtest.is_a?(Hash) then
         msg = "ERROR #{Date.today.to_s} in #{filepath} for #{company} RESULT: #{obj.to_json}" if msgtest.has_key? "error"
+        if msgtest.has_key? "status" then
+          statusvalue = msgtest["status"]
+          puts "#{statusvalue} STATUS"
+        end
+        msg = "ERROR #{Date.today.to_s} in #{filepath} for #{company} RESULT: #{obj.to_json}" if msgtest.has_key? "queued"
+
       end
       filepath = "./export/FC/FC_#{Date.today.to_s}"
       msg = "#{msg}\n"
@@ -191,6 +203,8 @@ class CompanyData
       msg = "#{Date.today.to_s}_SAVED in #{filepath} for #{company} RESULT: #{msgtest[0...20]}"
       if msgtest.is_a?(Hash) then
         msg = "ERROR #{Date.today.to_s} in #{filepath} for #{company} RESULT: #{obj.to_json}" if msgtest.has_key? "error"
+        msg = "#{msg}\n"
+        @errorlist << msg
       end
       filepath = "./export/CB/CB_#{Date.today.to_s}"
       msg = "#{msg}\n"
@@ -227,6 +241,7 @@ class CompanyData
     key_made = @key_made
     self.get_company_CBinfo(filename, key_made)
     #self.write_FCtest_toJSON(filename, key_made)
+    puts @errorlist
   end
 
 end

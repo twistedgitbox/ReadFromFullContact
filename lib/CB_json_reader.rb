@@ -119,6 +119,15 @@ class CB_ContactINFO
     puts
     puts
     puts "FILELOCATION: #{datafile}"
+    #CSV.open(datafile, 'wb') do |csv|
+    #  csv << info_hash.keys
+    #  puts info_hash.keys
+    #  puts info_hash.values
+    #  max_len = info_hash.values.map(&:length).max
+    #  (0...max_len).zip(*info_hash.values).each do |_, *row|
+    #    csv << row
+    #  end
+    #end
     CSV.open(datafile, "a", headers: info_hash.keys) do |csv|
       #csv << ['URL', 'COMPANY', 'DESC', 'KEYWDS', 'PHONE']
       puts info_hash.keys
