@@ -2,5 +2,9 @@
 .api_key*
 *.json
 *.csv
+.buildconfig
+csvthing
+TestCompanies
+TestFull
 
 ARCHIVE/*
